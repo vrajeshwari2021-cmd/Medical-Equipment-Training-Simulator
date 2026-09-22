@@ -1,196 +1,412 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import patientMonitor from "../assets/images/patient-monitor.png";
+import { useState, useEffect } from "react";
 
 function PatientMonitor() {
-  const [heartRate, setHeartRate] = useState(72);
-  const [spo2, setSpo2] = useState(98);
-  const [bp, setBp] = useState("120/80");
-  const [temp, setTemp] = useState(36.8);
-  const [resp, setResp] = useState(16);
-
-  const [running, setRunning] = useState(false);
-  const [alarm, setAlarm] = useState("");
-  const [condition, setCondition] = useState("Normal");
-
-  function changeCondition(value) {
-    setCondition(value);
-  }
+  const [progress, setProgress] = useState({
+    learn: false,
+    practice: false,
+    internal: false,
+    troubleshooting: false,
+    assessment: false,
+  });
 
   useEffect(() => {
-    if (!running) return;
+    const loadProgress = () => {
+      setProgress({
+        learn: localStorage.getItem("patientMonitorLearn") === "completed",
+        practice: localStorage.getItem("patientMonitorPractice") === "completed",
+        internal: localStorage.getItem("patientMonitorInternal") === "completed",
+        troubleshooting:
+          localStorage.getItem("patientMonitorTroubleshooting") === "completed",
+        assessment:
+          localStorage.getItem("patientMonitorAssessment") === "completed",
+      });
+    };
 
-    const interval = setInterval(() => {
+    loadProgress();
 
-      switch (condition) {
+    window.addEventListener("storage", loadProgress);
 
-        case "Normal":
-          setHeartRate(Math.floor(Math.random() * 10) + 70);
-          setSpo2(Math.floor(Math.random() * 2) + 98);
-          setBp("120/80");
-          setTemp((36.5 + Math.random() * 0.4).toFixed(1));
-          setResp(Math.floor(Math.random() * 3) + 15);
-          setAlarm("");
-          break;
+    return () => {
+      window.removeEventListener("storage", loadProgress);
+    };
+  }, []);
 
-        case "Tachycardia":
-          setHeartRate(Math.floor(Math.random() * 8) + 120);
-          setSpo2(98);
-          setBp("140/90");
-          setTemp(37.2);
-          setResp(22);
-          setAlarm("⚠ High Heart Rate Detected");
-          break;
+  const practiceUnlocked = progress.learn;
 
-        case "Bradycardia":
-          setHeartRate(Math.floor(Math.random() * 6) + 40);
-          setSpo2(97);
-          setBp("100/60");
-          setTemp(36.5);
-          setResp(12);
-          setAlarm("⚠ Low Heart Rate Detected");
-          break;
+  const internalUnlocked =
+    progress.learn && progress.practice;
 
-        case "Hypoxia":
-          setHeartRate(Math.floor(Math.random() * 8) + 105);
-          setSpo2(Math.floor(Math.random() * 3) + 86);
-          setBp("118/78");
-          setTemp(37.0);
-          setResp(28);
-          setAlarm("⚠ Low Oxygen Saturation");
-          break;
+  const troubleshootingUnlocked =
+    progress.learn &&
+    progress.practice &&
+    progress.internal;
 
-        default:
-          break;
-      }
+  const assessmentUnlocked =
+    progress.learn &&
+    progress.practice &&
+    progress.internal &&
+    progress.troubleshooting;
 
-    }, 1000);
-
-    return () => clearInterval(interval);
-
-  }, [running, condition]);
-   return (
+  return (
     <div className="min-h-screen bg-slate-100 p-8">
+      <div className="max-w-6xl mx-auto">
 
-      <Link
-        to="/equipment"
-        className="text-blue-600 font-semibold hover:underline"
-      >
-        ← Back to Equipment
-      </Link>
+        <Link
+          to="/equipment"
+          className="text-blue-700 font-bold hover:underline"
+        >
+          ← Back to Equipment
+        </Link>
 
-      <h1 className="text-5xl font-bold text-center text-blue-700 mt-6 mb-10">
-        Patient Monitor Simulator
-      </h1>
+        {/* HEADER */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mt-6 text-center">
+          <div className="text-6xl mb-4">🖥️</div>
 
-      {/* Equipment Details */}
-      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-8 grid md:grid-cols-2 gap-10">
+          <h1 className="text-4xl font-bold text-blue-700">
+            Patient Monitor Training
+          </h1>
 
-        <div className="flex justify-center">
-          <img
-            src={patientMonitor}
-            alt="Patient Monitor"
-            className="w-full max-w-md rounded-xl shadow-lg"
-          />
+          <p className="text-gray-600 text-lg mt-3">
+            Complete each training module to unlock the next activity.
+          </p>
         </div>
 
-        <div>
-          <h2 className="text-3xl font-bold text-blue-700 mb-4">
-            Philips IntelliVue MX550
+        {/* MODULES */}
+        <div className="mt-10">
+
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
+            Patient Monitor Learning Modes
           </h2>
 
-          <p className="text-gray-700 leading-7">
-            The Patient Monitor continuously measures a patient's
-            Heart Rate, SpO₂, Blood Pressure, Temperature and
-            Respiration Rate in real time.
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* ================= LEARN ================= */}
+            <Link
+              to="/patient-monitor/learn"
+              className="bg-white rounded-2xl shadow-lg p-7
+              hover:shadow-2xl transition-all border-2 border-transparent
+              hover:border-blue-500"
+            >
+              <div className="flex justify-between">
+                <div className="text-5xl">📖</div>
+
+                {progress.learn && (
+                  <span className="bg-green-100 text-green-700
+                  px-3 py-1 rounded-full text-sm font-bold">
+                    ✓ Completed
+                  </span>
+                )}
+              </div>
+
+              <h3 className="text-2xl font-bold text-blue-700 mt-5">
+                Learn
+              </h3>
+
+              <p className="text-gray-600 mt-3">
+                Learn about the patient monitor, its components,
+                functions and basic working principle.
+              </p>
+
+              <div className="mt-5">
+                <span className="inline-block bg-blue-600 text-white
+                px-5 py-2 rounded-lg font-bold">
+                  {progress.learn
+                    ? "✓ Learning Completed"
+                    : "Start Learning →"}
+                </span>
+              </div>
+            </Link>
+
+            {/* ================= PRACTICE ================= */}
+            {practiceUnlocked ? (
+              <Link
+                to="/patient-monitor/practice"
+                className="bg-white rounded-2xl shadow-lg p-7
+                hover:shadow-2xl transition-all border-2
+                border-transparent hover:border-green-500"
+              >
+                <div className="flex justify-between">
+                  <div className="text-5xl">🧪</div>
+
+                  {progress.practice && (
+                    <span className="bg-green-100 text-green-700
+                    px-3 py-1 rounded-full text-sm font-bold">
+                      ✓ Completed
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-2xl font-bold text-green-700 mt-5">
+                  Practice
+                </h3>
+
+                <p className="text-gray-600 mt-3">
+                  Practice placing ECG leads, SpO₂ probe,
+                  BP cuff and temperature probe.
+                </p>
+
+                <div className="mt-5">
+                  <span className="inline-block bg-green-600
+                  text-white px-5 py-2 rounded-lg font-bold">
+                    {progress.practice
+                      ? "✓ Practice Completed"
+                      : "Start Practice →"}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <LockedCard
+                icon="🔒"
+                title="Practice"
+                text="Complete the Learn module to unlock the practical training activity."
+                button="🔒 Complete Learn First"
+              />
+            )}
+
+            {/* ================= INTERNAL ================= */}
+            {internalUnlocked ? (
+              <Link
+                to="/patient-monitor/internal"
+                className="bg-white rounded-2xl shadow-lg p-7
+                hover:shadow-2xl transition-all border-2
+                border-transparent hover:border-purple-500"
+              >
+                <div className="flex justify-between">
+                  <div className="text-5xl">🔧</div>
+
+                  {progress.internal && (
+                    <span className="bg-green-100 text-green-700
+                    px-3 py-1 rounded-full text-sm font-bold">
+                      ✓ Completed
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-2xl font-bold text-purple-700 mt-5">
+                  Internal Assembly
+                </h3>
+
+                <p className="text-gray-600 mt-3">
+                  Connect internal ECG components in the correct
+                  signal-processing sequence.
+                </p>
+
+                <div className="mt-5">
+                  <span className="inline-block bg-purple-600
+                  text-white px-5 py-2 rounded-lg font-bold">
+                    {progress.internal
+                      ? "✓ Assembly Completed"
+                      : "Start Assembly →"}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <LockedCard
+                icon="🔒"
+                title="Internal Assembly"
+                text="Complete the Practice module to unlock internal component assembly."
+                button="🔒 Complete Practice First"
+              />
+            )}
+
+            {/* ================= TROUBLESHOOTING ================= */}
+            {troubleshootingUnlocked ? (
+              <Link
+                to="/patient-monitor/troubleshooting"
+                className="bg-white rounded-2xl shadow-lg p-7
+                hover:shadow-2xl transition-all border-2
+                border-transparent hover:border-red-500"
+              >
+                <div className="flex justify-between">
+                  <div className="text-5xl">🛠️</div>
+
+                  {progress.troubleshooting && (
+                    <span className="bg-green-100 text-green-700
+                    px-3 py-1 rounded-full text-sm font-bold">
+                      ✓ Completed
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-2xl font-bold text-red-700 mt-5">
+                  Troubleshooting
+                </h3>
+
+                <p className="text-gray-600 mt-3">
+                  Identify common patient monitor faults and
+                  perform troubleshooting activities.
+                </p>
+
+                <div className="mt-5">
+                  <span className="inline-block bg-red-600
+                  text-white px-5 py-2 rounded-lg font-bold">
+                    {progress.troubleshooting
+                      ? "✓ Troubleshooting Completed"
+                      : "Start Troubleshooting →"}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <LockedCard
+                icon="🔒"
+                title="Troubleshooting"
+                text="Complete Internal Assembly to unlock troubleshooting practice."
+                button="🔒 Complete Assembly First"
+              />
+            )}
+
+            {/* ================= ASSESSMENT ================= */}
+            {assessmentUnlocked ? (
+              <Link
+                to="/patient-monitor/assessment"
+                className="bg-white rounded-2xl shadow-lg p-7
+                hover:shadow-2xl transition-all border-2
+                border-transparent hover:border-orange-500"
+              >
+                <div className="flex justify-between">
+                  <div className="text-5xl">📝</div>
+
+                  {progress.assessment && (
+                    <span className="bg-green-100 text-green-700
+                    px-3 py-1 rounded-full text-sm font-bold">
+                      ✓ Completed
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-2xl font-bold text-orange-600 mt-5">
+                  Assessment
+                </h3>
+
+                <p className="text-gray-600 mt-3">
+                  Test your knowledge through multiple-choice questions
+                  and view your final score.
+                </p>
+
+                <div className="mt-5">
+                  <span className="inline-block bg-orange-500
+                  text-white px-5 py-2 rounded-lg font-bold">
+                    {progress.assessment
+                      ? "✓ Assessment Completed"
+                      : "Start Assessment →"}
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <LockedCard
+                icon="🔒"
+                title="Assessment"
+                text="Complete all previous training modules to unlock the final assessment."
+                button="🔒 Complete Previous Steps"
+              />
+            )}
+
+          </div>
+        </div>
+
+        {/* SEQUENCE */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mt-10 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Recommended Learning Sequence
+          </h2>
+
+          <p className="text-gray-600 mt-2">
+            Complete each module in order to progress through
+            the Patient Monitor training.
           </p>
 
-          <h3 className="text-xl font-semibold mt-6 mb-3">
-            Monitored Parameters
-          </h3>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-7">
 
-          <ul className="list-disc ml-6 space-y-2">
-            <li>Heart Rate (HR)</li>
-            <li>SpO₂</li>
-            <li>Blood Pressure</li>
-            <li>Temperature</li>
-            <li>Respiration Rate</li>
-          </ul>
-        </div>
+            <Step number="1" name="Learn" completed={progress.learn} />
 
-      </div>
+            <span className="text-2xl text-gray-400">→</span>
 
-      {/* Simulator */}
-      <div className="max-w-5xl mx-auto bg-black rounded-2xl shadow-2xl p-8 mt-10">
+            <Step
+              number="2"
+              name="Practice"
+              completed={progress.practice}
+              unlocked={practiceUnlocked}
+            />
 
-        <h2 className="text-center text-3xl font-bold text-green-400 mb-8">
-          Live Patient Monitor
-        </h2>
+            <span className="text-2xl text-gray-400">→</span>
 
-        <div className="grid grid-cols-2 gap-6 text-3xl text-green-400">
+            <Step
+              number="3"
+              name="Assembly"
+              completed={progress.internal}
+              unlocked={internalUnlocked}
+            />
 
-          <div>❤️ Heart Rate</div>
-          <div>{heartRate} BPM</div>
+            <span className="text-2xl text-gray-400">→</span>
 
-          <div>💙 SpO₂</div>
-          <div>{spo2}%</div>
+            <Step
+              number="4"
+              name="Troubleshooting"
+              completed={progress.troubleshooting}
+              unlocked={troubleshootingUnlocked}
+            />
 
-          <div>🩸 Blood Pressure</div>
-          <div>{bp}</div>
+            <span className="text-2xl text-gray-400">→</span>
 
-          <div>🌡 Temperature</div>
-          <div>{temp} °C</div>
+            <Step
+              number="5"
+              name="Assessment"
+              completed={progress.assessment}
+              unlocked={assessmentUnlocked}
+            />
 
-          <div>🫁 Respiration</div>
-          <div>{resp} bpm</div>
-
-        </div>
-
-        {/* Patient Condition */}
-        <div className="flex justify-center mt-8">
-          <select
-            value={condition}
-            onChange={(e) => changeCondition(e.target.value)}
-            className="bg-white text-black border rounded-lg px-4 py-3"
-          >
-            <option value="Normal">Normal</option>
-            <option value="Tachycardia">Tachycardia</option>
-            <option value="Bradycardia">Bradycardia</option>
-            <option value="Hypoxia">Hypoxia</option>
-          </select>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex justify-center gap-5 mt-8">
-
-          <button
-            onClick={() => setRunning(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
-          >
-            Start Monitoring
-          </button>
-
-          <button
-            onClick={() => setRunning(false)}
-            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg"
-          >
-            Stop Monitoring
-          </button>
-
-        </div>
-
-        {/* Alarm */}
-        {alarm && (
-          <div className="mt-8 bg-red-600 text-white text-center p-4 rounded-xl text-xl font-bold">
-            {alarm}
           </div>
-        )}
+        </div>
 
       </div>
-
     </div>
   );
 }
 
+/* ================= LOCKED CARD ================= */
+
+function LockedCard({ icon, title, text, button }) {
+  return (
+    <div className="bg-gray-200 rounded-2xl shadow
+    p-7 border-2 border-gray-300 opacity-70">
+
+      <div className="text-5xl">{icon}</div>
+
+      <h3 className="text-2xl font-bold text-gray-500 mt-5">
+        {title}
+      </h3>
+
+      <p className="text-gray-500 mt-3">
+        {text}
+      </p>
+
+      <div className="mt-5">
+        <span className="inline-block bg-gray-400 text-white
+        px-5 py-2 rounded-lg font-bold">
+          {button}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ================= STEP ================= */
+
+function Step({ number, name, completed, unlocked = false }) {
+  return (
+    <span
+      className={`px-5 py-3 rounded-xl font-bold ${
+        completed
+          ? "bg-green-100 text-green-700"
+          : unlocked
+          ? "bg-blue-100 text-blue-700"
+          : "bg-gray-200 text-gray-500"
+      }`}
+    >
+      {completed ? "✓" : unlocked ? "🔓" : "🔒"} {number}. {name}
+    </span>
+  );
+}
+
 export default PatientMonitor;
-  
