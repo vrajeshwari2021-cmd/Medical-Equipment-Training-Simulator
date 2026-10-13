@@ -15,22 +15,43 @@ import PatientMonitorInternal from "./pages/PatientMonitorInternal";
 import PatientMonitorTroubleshooting from "./pages/PatientMonitorTroubleshooting";
 import Assessment from "./pages/Assessment";
 
-// ECG Main Dashboard ONLY
+// ECG Monitor Pages
 import ECGMonitor from "./pages/ECGMonitor";
 import ECGMonitorLearn from "./pages/ECGMonitorLearn";
 import ECGMonitorPractice from "./pages/ECGMonitorPractice";
+import ECGMonitorInternal from "./pages/ECGMonitorInternal";
+import ECGMonitorTroubleshooting from "./pages/ECGMonitorTroubleshooting";
+import ECGMonitorAssessment from "./pages/ECGMonitorAssessment";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Main Pages */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/equipment" element={<Equipment />} />
+        {/* ================= MAIN PAGES ================= */}
 
-        {/* Patient Monitor */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/equipment"
+          element={<Equipment />}
+        />
+
+        {/* ================= PATIENT MONITOR ================= */}
+
         <Route
           path="/patient-monitor"
           element={<PatientMonitor />}
@@ -66,20 +87,40 @@ function App() {
           element={<Assessment />}
         />
 
-        {/* ECG Monitor */}
+        {/* ================= ECG MONITOR ================= */}
+
         <Route
           path="/ecg-monitor"
           element={<ECGMonitor />}
         />
+
         <Route
-  path="/ecg-monitor/learn"
-  element={<ECGMonitorLearn />}
+          path="/ecg-monitor/learn"
+          element={<ECGMonitorLearn />}
+        />
+
+        <Route
+          path="/ecg-monitor/practice"
+          element={<ECGMonitorPractice />}
+        />
+
+        <Route
+          path="/ecg-monitor/internal"
+          element={<ECGMonitorInternal />}
+        />
+<Route
+  path="/ecg-monitor/troubleshooting"
+  element={<ECGMonitorTroubleshooting />}
 />
-         <Route
-  path="/ecg-monitor/practice"
-  element={<ECGMonitorPractice />}
+        
+        <Route
+  path="/ecg-monitor/assessment"
+  element={<ECGMonitorAssessment />}
 />
-        {/* 404 */}
+        
+
+        {/* ================= 404 ================= */}
+
         <Route
           path="*"
           element={<NotFound />}
